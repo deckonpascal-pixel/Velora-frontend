@@ -85,6 +85,13 @@ function Sketch({ kind, wash, stroke = C.textDark, className, style }) {
   );
 }
 
+function ProductThumb({ p, size, className, style }) {
+  if (p.image) {
+    return <img src={p.image} alt={p.name} className={className} style={{ ...style, width: size ?? style?.width, height: size ?? style?.height, objectFit: "cover" }} />;
+  }
+  return <Sketch kind={p.kind} wash={C.creamDim} stroke={C.textDark} className={className} style={{ ...style, width: size ?? style?.width, height: size ?? style?.height }} />;
+}
+
 /* ------------------------------------------------------------------ */
 /* Data                                                                  */
 /* ------------------------------------------------------------------ */
@@ -256,7 +263,7 @@ function ProductCard({ p, inWish, inCart, onToggleWish, onAddCart }) {
         <button onClick={() => onToggleWish(p.id)} aria-label="wishlist" className="absolute flex items-center justify-center" style={{ top: 12, right: 12, zIndex: 10, width: 32, height: 32, borderRadius: 9999, background: C.cream, border: "none", cursor: "pointer" }}>
           <Heart size={14} color={C.gold} fill={inWish ? C.gold : "none"} />
         </button>
-        <Sketch kind={p.kind} wash={p.wash} stroke={C.textDark} className="w-full" style={{ height: 224 }} />
+        <ProductThumb p={p} className="w-full" style={{ height: 224 }} />
       </div>
       <div className="mt-3">
         <div className="f-mono uppercase tracking-wider" style={{ color: C.gold, fontSize: 10 }}>{p.cat}</div>
@@ -702,7 +709,7 @@ function AdminDashboard({ adminToken, onLoggedIn, exitAdmin, showToast }) {
             <div className="space-y-4">
               {topProducts.map((p) => (
                 <div key={p.id} className="flex items-center gap-3">
-                  <Sketch kind={p.kind} wash={C.creamDim} stroke={C.textDark} className="rounded-md flex-shrink-0" style={{ width: 40, height: 40 }} />
+                  <ProductThumb p={p} className="rounded-md flex-shrink-0" style={{ width: 40, height: 40 }} />
                   <div className="flex-1 min-w-0">
                     <div className="f-body text-xs truncate" style={{ color: C.textLight }}>{p.name}</div>
                     <div className="f-mono" style={{ color: C.textLightMuted, fontSize: 10 }}>{p.sold} sold</div>
@@ -723,11 +730,35 @@ function AdminDashboard({ adminToken, onLoggedIn, exitAdmin, showToast }) {
   );
 }
 
+function resizeImageFile(file, maxDim = 900) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
+        else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 const PRODUCT_KINDS = ["top", "hoodie", "jacket", "pants", "bag", "shoe", "dress"];
 
 function ProductForm({ initial, onCancel, onSave }) {
-  const [form, setForm] = useState(initial || { name: "", category: "", kind: "top", price: "", was: "", badge: "", stock: "100" });
+  const [form, setForm] = useState(initial || { name: "", category: "", kind: "top", price: "", was: "", badge: "", stock: "100", image: "" });
   const [busy, setBusy] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
   const field = (key, label, type = "text") => (
     <div>
       <label className="f-mono uppercase tracking-wider block mb-1" style={{ color: C.textLightMuted, fontSize: 10 }}>{label}</label>
@@ -740,8 +771,31 @@ function ProductForm({ initial, onCancel, onSave }) {
       />
     </div>
   );
+  const handlePhoto = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageBusy(true);
+    try {
+      const dataUrl = await resizeImageFile(file);
+      setForm((f) => ({ ...f, image: dataUrl }));
+    } catch {
+      // ignore — form still works without a photo
+    } finally {
+      setImageBusy(false);
+    }
+  };
   return (
     <div className="rounded-xl p-5 mb-6" style={{ background: C.surface, border: `1px solid ${C.surfaceLine}` }}>
+      <div className="mb-4">
+        <label className="f-mono uppercase tracking-wider block mb-1" style={{ color: C.textLightMuted, fontSize: 10 }}>Photo</label>
+        <div className="flex items-center gap-3">
+          <div className="rounded-md flex items-center justify-center flex-shrink-0" style={{ width: 64, height: 64, background: C.ink, border: `1px solid ${C.surfaceLine}`, overflow: "hidden" }}>
+            {form.image ? <img src={form.image} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span className="f-mono" style={{ fontSize: 9, color: C.textLightMuted }}>None</span>}
+          </div>
+          <input type="file" accept="image/*" onChange={handlePhoto} className="f-body text-xs" style={{ color: C.textLightMuted }} />
+          {imageBusy && <span className="f-mono text-xs" style={{ color: C.textLightMuted }}>Processing…</span>}
+        </div>
+      </div>
       <div className="grid md:grid-cols-3 gap-4 mb-4">
         {field("name", "Product Name")}
         {field("category", "Category (e.g. Hoodies)")}
@@ -780,7 +834,7 @@ function ProductForm({ initial, onCancel, onSave }) {
 
 function ProductsPanel({ products, setProducts, adminToken, showToast, loading }) {
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState(null); // product being edited, or null
+  const [editing, setEditing] = useState(null);
 
   const createProduct = async (form) => {
     try {
@@ -835,13 +889,13 @@ function ProductsPanel({ products, setProducts, adminToken, showToast, loading }
             <div key={p.id}>
               {editing === p.id ? (
                 <ProductForm
-                  initial={{ name: p.name, category: p.cat, kind: p.kind, price: String(p.price), was: p.was ? String(p.was) : "", badge: p.badge || "", stock: String(p.stock ?? 100) }}
+                  initial={{ name: p.name, category: p.cat, kind: p.kind, price: String(p.price), was: p.was ? String(p.was) : "", badge: p.badge || "", stock: String(p.stock ?? 100), image: p.image || "" }}
                   onCancel={() => setEditing(null)}
                   onSave={(form) => updateProduct(p.id, form)}
                 />
               ) : (
                 <div className="rounded-xl p-4 flex items-center gap-4" style={{ background: C.surface, border: `1px solid ${C.surfaceLine}` }}>
-                  <Sketch kind={p.kind} wash={C.creamDim} stroke={C.textDark} className="rounded-md flex-shrink-0" style={{ width: 48, height: 48 }} />
+                  <ProductThumb p={p} className="rounded-md flex-shrink-0" style={{ width: 48, height: 48 }} />
                   <div className="flex-1 min-w-0">
                     <div className="f-body text-sm" style={{ color: C.textLight }}>{p.name}</div>
                     <div className="f-mono" style={{ color: C.textLightMuted, fontSize: 11 }}>{p.cat} · {fmt(p.price)}{p.was ? ` (was ${fmt(p.was)})` : ""} · stock: {p.stock ?? "—"}</div>
@@ -949,7 +1003,7 @@ function CartDrawer({ open, onClose, cart, products, setQty, removeItem, showToa
         <div className="space-y-5">
           {items.map((i) => (
             <div key={i.id} className="flex gap-3">
-              <Sketch kind={i.product.kind} wash={C.creamDim} stroke={C.textDark} className="rounded-lg flex-shrink-0" style={{ width: 80, height: 96 }} />
+              <ProductThumb p={i.product} className="rounded-lg flex-shrink-0" style={{ width: 80, height: 96 }} />
               <div className="flex-1">
                 <div className="f-body text-sm" style={{ color: C.textDark }}>{i.product.name}</div>
                 <div className="f-mono text-xs mt-1" style={{ color: C.gold }}>{fmt(i.product.price)}</div>
@@ -992,7 +1046,7 @@ function WishDrawer({ open, onClose, wishIds, products, onToggleWish, onAddCart 
         <div className="space-y-5">
           {items.map((p) => (
             <div key={p.id} className="flex gap-3">
-              <Sketch kind={p.kind} wash={C.creamDim} stroke={C.textDark} className="rounded-lg flex-shrink-0" style={{ width: 80, height: 96 }} />
+              <ProductThumb p={p} className="rounded-lg flex-shrink-0" style={{ width: 80, height: 96 }} />
               <div className="flex-1">
                 <div className="f-body text-sm" style={{ color: C.textDark }}>{p.name}</div>
                 <div className="f-mono text-xs mt-1" style={{ color: C.gold }}>{fmt(p.price)}</div>
