@@ -58,7 +58,7 @@ function Logo({ dark }) {
   return (
     <div className="flex items-center gap-2">
       <Crown size={22} />
-      <span className="f-logo tracking-wide" style={{ color: dark ? C.textDark : C.textLight, fontSize: 24 }}>VELORA</span>
+      <span className="f-logo tracking-wide" style={{ color: dark ? C.textDark : C.textLight, fontSize: 24 }}>TRAP DREAMS</span>
     </div>
   );
 }
@@ -96,15 +96,15 @@ function ProductThumb({ p, size, className, style }) {
 /* Data                                                                  */
 /* ------------------------------------------------------------------ */
 const PRODUCTS = [
-  { id: "p1", name: "Velora Signature Hoodie", cat: "Hoodies", price: 24000, kind: "hoodie", wash: "#EDE7D8", badge: "New" },
-  { id: "p2", name: "Velora Oversized Tee", cat: "T-Shirts", price: 13500, was: 15000, kind: "top", wash: "#F1ECE0", badge: "Sale" },
-  { id: "p3", name: "Velora Premium Joggers", cat: "Pants", price: 18500, kind: "pants", wash: "#EAE3D2" },
-  { id: "p4", name: "Velora Varsity Jacket", cat: "Jackets", price: 32000, kind: "jacket", wash: "#EDE4D0", badge: "New" },
-  { id: "p5", name: "Velora Court Tee", cat: "T-Shirts", price: 12000, kind: "top", wash: "#F1ECE0" },
-  { id: "p6", name: "Velora Bomber Jacket", cat: "Jackets", price: 38500, kind: "jacket", wash: "#EAE3D2" },
-  { id: "p7", name: "Velora Cargo Pants", cat: "Pants", price: 21500, kind: "pants", wash: "#EDE7D8" },
-  { id: "p8", name: "Velora Weekend Tote", cat: "Accessories", price: 15500, kind: "bag", wash: "#F1ECE0" },
-  { id: "p9", name: "Velora Court Sneaker", cat: "Accessories", price: 29500, kind: "shoe", wash: "#EAE3D2" },
+  { id: "p1", name: "Trap Dreams Signature Hoodie", cat: "Hoodies", price: 24000, kind: "hoodie", wash: "#EDE7D8", badge: "New" },
+  { id: "p2", name: "Trap Dreams Oversized Tee", cat: "T-Shirts", price: 13500, was: 15000, kind: "top", wash: "#F1ECE0", badge: "Sale" },
+  { id: "p3", name: "Trap Dreams Premium Joggers", cat: "Pants", price: 18500, kind: "pants", wash: "#EAE3D2" },
+  { id: "p4", name: "Trap Dreams Varsity Jacket", cat: "Jackets", price: 32000, kind: "jacket", wash: "#EDE4D0", badge: "New" },
+  { id: "p5", name: "Trap Dreams Court Tee", cat: "T-Shirts", price: 12000, kind: "top", wash: "#F1ECE0" },
+  { id: "p6", name: "Trap Dreams Bomber Jacket", cat: "Jackets", price: 38500, kind: "jacket", wash: "#EAE3D2" },
+  { id: "p7", name: "Trap Dreams Cargo Pants", cat: "Pants", price: 21500, kind: "pants", wash: "#EDE7D8" },
+  { id: "p8", name: "Trap Dreams Weekend Tote", cat: "Accessories", price: 15500, kind: "bag", wash: "#F1ECE0" },
+  { id: "p9", name: "Trap Dreams Court Sneaker", cat: "Accessories", price: 29500, kind: "shoe", wash: "#EAE3D2" },
 ];
 
 const CATEGORIES = [
@@ -318,7 +318,7 @@ function Home({ setPage, products, wishIds, cartIds, onToggleWish, onAddCart }) 
           <div className="rise">
             <Eyebrow>New Collection</Eyebrow>
             <h1 className="f-head text-4xl md:text-6xl font-black mb-5" style={{ color: C.textLight, lineHeight: 1.05 }}>
-              Welcome to<br /><span style={{ color: C.gold }}>Velora</span>
+              Welcome to<br /><span style={{ color: C.gold }}>Trap Dreams</span>
             </h1>
             <p className="f-body text-base leading-relaxed max-w-sm mb-8" style={{ color: C.textLightMuted }}>
               Quality clothing, exceptional style, delivered with care.
@@ -398,7 +398,7 @@ function Shop({ products, wishIds, cartIds, onToggleWish, onAddCart }) {
       <div className="py-10" style={{ background: C.ink }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <Eyebrow>Full Collection</Eyebrow>
-          <h1 className="f-head text-3xl md:text-4xl font-black" style={{ color: C.textLight }}>Shop Velora</h1>
+          <h1 className="f-head text-3xl md:text-4xl font-black" style={{ color: C.textLight }}>Shop Trap Dreams</h1>
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-10">
@@ -462,12 +462,12 @@ function About() {
       <div className="py-10" style={{ background: C.ink }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <Eyebrow>About Us</Eyebrow>
-          <h1 className="f-head text-3xl md:text-4xl font-black" style={{ color: C.textLight }}>The Velora story</h1>
+          <h1 className="f-head text-3xl md:text-4xl font-black" style={{ color: C.textLight }}>The Trap Dreams story</h1>
         </div>
       </div>
       <div className="max-w-3xl mx-auto px-5 md:px-8 py-14">
         <p className="f-body text-base leading-relaxed mb-5" style={{ color: C.textDarkMuted }}>
-          Velora started in a single Lagos sewing room in 2023 with one goal: build clothing that looks premium without
+          Trap Dreams started in a single Lagos sewing room in 2023 with one goal: build clothing that looks premium without
           the wait time or markup of imported streetwear. Every hoodie, tee, and jacket is cut and finished locally.
         </p>
         <p className="f-body text-base leading-relaxed mb-10" style={{ color: C.textDarkMuted }}>
@@ -972,7 +972,7 @@ function CartDrawer({ open, onClose, cart, products, setQty, removeItem, showToa
 
   const orderRef = placedOrder ? `VL${String(placedOrder.id).padStart(4, "0")}` : "";
   const waText = placedOrder
-    ? encodeURIComponent(`Hi Velora! I just paid for order #${orderRef} (${fmt(placedOrder.total)}). Here's my payment proof:`)
+    ? encodeURIComponent(`Hi Trap Dreams! I just paid for order #${orderRef} (${fmt(placedOrder.total)}). Here's my payment proof:`)
     : "";
   const waLink = `https://wa.me/${PAYMENT_INFO.whatsapp}?text=${waText}`;
 
@@ -1111,7 +1111,7 @@ function AccountModal({ open, onClose, onAuthed, showToast }) {
           <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="f-body w-full px-4 py-3 rounded-md border outline-none" style={{ borderColor: C.lineDark, background: "#fff", color: C.textDark }} />
           <GoldButton onClick={submit} className="w-full justify-center">{busy ? "Please wait…" : tab === "signin" ? "Sign in" : "Create account"}</GoldButton>
         </form>
-        <p className="f-mono mt-4 text-center" style={{ fontSize: 10, color: C.textDarkMuted }}>Real account, stored in the Velora database.</p>
+        <p className="f-mono mt-4 text-center" style={{ fontSize: 10, color: C.textDarkMuted }}>Real account, stored in the Trap Dreams database.</p>
       </div>
     </div>
   );
@@ -1136,7 +1136,7 @@ function Footer({ setPage, auth, signOut }) {
           {auth && <button onClick={signOut} className="block" style={{ background: "none", border: "none", cursor: "pointer", color: C.gold, font: "inherit" }}>Sign out ({auth.user.name})</button>}
         </div>
       </div>
-      <div className="text-center f-mono pb-6" style={{ color: C.textLightMuted, fontSize: 10 }}>© 2026 Velora</div>
+      <div className="text-center f-mono pb-6" style={{ color: C.textLightMuted, fontSize: 10 }}>© 2026 Trap Dreams</div>
     </footer>
   );
 }
